@@ -5,8 +5,9 @@ function submitForm() {
     const field3 = document.getElementById('field3').value;
   
     // Walidacja danych na froncie
+    const errorMessage = document.getElementById('errorMessage');
     if (!field1 || !field2 || !field3) {
-      alert('Wszystkie pola formularza są wymagane.');
+      errorMessage.textContent = 'Wszystkie pola formularza są wymagane.';
       return;
     }
   
@@ -22,7 +23,9 @@ function submitForm() {
       body: JSON.stringify(data),
     })
     .then(response => response.text())
-    .then(message => alert(message))
+    .then(message => {
+      errorMessage.textContent = message;
+    })
     .catch(error => console.error('Błąd:', error));
   }
   
