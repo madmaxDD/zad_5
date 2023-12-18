@@ -36,7 +36,25 @@ app.post('/users', (req, res) => {
   // Odpowiedź sukcesu
   res.status(200).send('Dane zostały pomyślnie zapisane.');
 });
-
+// Endpoint do pobierania danych
+app.get('/users', (req, res) => {
+    res.json(usersData);
+  });
+  
+// Endpoint do usuwania danych
+app.delete('/users', (req, res) => {
+    const idsToDelete = req.body.ids;
+  
+    // Usuń obiekty o podanych ID z listy
+    const updatedUsers = usersData.filter(user => !idsToDelete.includes(user.id));
+  
+    // Zaktualizuj listę danych
+    usersData.length = 0;
+    usersData.push(...updatedUsers);
+  
+    res.json(usersData);
+  });
+  
 // Nasłuchiwanie na określonym porcie
 app.listen(PORT, () => {
   console.log(`Aplikacja działa na http://localhost:${PORT}`);
