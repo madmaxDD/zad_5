@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>Formularz</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Formularz Dodawania Danych</title>
 </head>
 <body>
+    <form id="userForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
 
-  <form id="myForm">
-    <label for="field1">Pole 1:</label>
-    <input type="text" id="field1" name="field1">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
-    <label for="field2">Pole 2:</label>
-    <input type="text" id="field2" name="field2">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
 
-    <label for="field3">Pole 3:</label>
-    <input type="text" id="field3" name="field3">
+        <button type="button" onclick="submitForm()">Add</button>
+    </form>
 
-    <button type="button" onclick="submitForm()">Wyślij</button>
-  </form>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,64 +1,61 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Wysłanie asynchronicznego zapytania na backend po załadowaniu strony
-    fetch('/users')
-      .then(response => response.json())
-      .then(data => {
-        // Wyświetlenie danych w tabeli
-        displayUsers(data);
-      })
-      .catch(error => console.error('Błąd:', error));
-      const deleteButton = document.getElementById('deleteSelected');
-      deleteButton.addEventListener('click', deleteSelectedUsers);
-  });
+// Funkcja do pobierania i wyświetlania danych
+function fetchData() {
+  fetch('/users')
+  .then(response => response.json())
+  .then(data => {
+      const table = document.getElementById('usersTable');
+      // Czyszczenie tabeli przed aktualizacją
+      table.innerHTML = '';
 
-  function deleteSelectedUsers() {
-    const table = document.getElementById('userTable');
-    const selectedRows = Array.from(table.querySelectorAll('input[type="checkbox"]:checked'));
-  
-    if (selectedRows.length === 0) {
-      alert('Zaznacz co najmniej jeden rekord do usunięcia.');
-      return;
-    }
-  
-    const selectedIds = selectedRows.map(row => row.dataset.id);
-  
-    // Wysłanie asynchronicznego zapytania DELETE na backend
-    fetch('/users', {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ ids: selectedIds }),
-    })
-    .then(response => response.json())
-    .then(data => {
-      // Po usunięciu obiektu zaktualizuj listę danych
-      displayUsers(data);
-    })
-    .catch(error => console.error('Błąd:', error));
-  }
+      // Tworzenie nagłówka tabeli
+      const headerRow = table.insertRow(0);
+      const headers = ['ID', 'Imię', 'Email', 'Wiek', 'Akcje'];
 
-  // Zaktualizuj plik list-script.js
+      headers.forEach(headerText => {
+          const th = document.createElement('th');
+          const text = document.createTextNode(headerText);
+          th.appendChild(text);
+          headerRow.appendChild(th);
+      });
 
-function displayUsers(users) {
-  const tableBody = document.querySelector('#userTable tbody');
+      // Wypełnianie tabeli danymi
+      data.forEach(user => {
+          const row = table.insertRow(-1);
+          const cellId = row.insertCell(0);
+          const cellName = row.insertCell(1);
+          const cellEmail = row.insertCell(2);
+          const cellAge = row.insertCell(3);
+          const cellActions = row.insertCell(4);
 
-  // Wyczyszczenie aktualnych danych w tabeli
-  tableBody.innerHTML = '';
+          cellId.innerHTML = user.id;
+          cellName.innerHTML = user.name;
+          cellEmail.innerHTML = user.email;
+          cellAge.innerHTML = user.age;
 
-  // Dodanie danych do tabeli
-  users.forEach((user, index) => {
-    const row = tableBody.insertRow();
-    const cell1 = row.insertCell(0);
-    const cell2 = row.insertCell(1);
-    const cell3 = row.insertCell(2);
-    const cell4 = row.insertCell(3);
-
-    cell1.innerHTML = `<input type="checkbox" data-id="${index}">`;
-    cell2.textContent = user.field1;
-    cell3.textContent = user.field2;
-    cell4.textContent = user.field3;
-  });
+          // Dodanie przycisku usuwania
+          const deleteButton = document.createElement('button');
+          deleteButton.innerHTML = 'Usuń';
+          deleteButton.onclick = function() {
+              deleteUser(user.id);
+          };
+          cellActions.appendChild(deleteButton);
+      });
+  })
+  .catch(error => console.error('Błąd:', error));
 }
 
-  
+// Funkcja do usuwania użytkownika
+function deleteUser(userId) {
+  fetch(`/users/${userId}`, {
+      method: 'DELETE',
+  })
+  .then(response => response.json())
+  .then(data => {
+      alert(data.message); // Wyświetlenie komunikatu
+      fetchData(); // Ponowne pobranie i wyświetlenie danych po usunięciu
+  })
+  .catch(error => console.error('Błąd:', error));
+}
+
+// Pobranie i wyświetlenie danych przy załadowaniu strony
+document.addEventListener('DOMContentLoaded', fetchData);

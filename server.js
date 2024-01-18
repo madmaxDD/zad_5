@@ -2,60 +2,57 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const app = express();
-const PORT = 3000;
+const port = 3000;
 
-// Przechowywanie danych w globalnej zmiennej
-const usersData = [];
-
-// Middleware do obsługi danych w formie JSON
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// Serwowanie statycznych plików
+// Dane przechowywane po stronie backendu
+let usersData = [];
+let id=1
 app.use(express.static('public'));
+app.use(bodyParser.json());
 
-// Endpoint dla formularza
+// Endpoint obsługujący dodawanie nowych danych
 app.post('/users', (req, res) => {
-  // Przyjęcie danych z formularza
-  const { field1, field2, field3 } = req.body;
+  const userData = req.body;
 
-  // Walidacja danych na froncie
-  if (!field1 || !field2 || !field3) {
-    return res.status(400).send('Wszystkie pola formularza są wymagane.');
+  // Walidacja danych po stronie frontendu
+  if (!userData.name || !userData.email || !userData.age) {
+    return res.status(400).json({ error: 'Wszystkie pola są wymagane.' });
   }
 
-  // Dodatkowa walidacja na backendzie (możesz dostosować do własnych wymagań)
-  // Przykładowa warunek: pola field2 muszą mieć co najmniej 5 znaków
-  if (field2.length < 5) {
-    return res.status(400).send('Pole field2 musi mieć co najmniej 5 znaków.');
+  // Przykładowa walidacja wieku
+  if (userData.age < 18) {
+    return res.status(400).json({ error: 'Wiek musi być równy lub większy niż 18.' });
   }
 
   // Zapisanie danych po stronie backendu
-  usersData.push({ field1, field2, field3 });
+  usersData.push({...req.body, id});
+  id++
 
-  // Odpowiedź sukcesu
-  res.status(200).send('Dane zostały pomyślnie zapisane.');
+  res.status(201).json({ message: 'Dane zostały dodane pomyślnie.' });
 });
-// Endpoint do pobierania danych
+
+// Endpoint obsługujący pobieranie wszystkich danych
 app.get('/users', (req, res) => {
-    res.json(usersData);
-  });
-  
-// Endpoint do usuwania danych
-app.delete('/users', (req, res) => {
-    const idsToDelete = req.body.ids;
-  
-    // Usuń obiekty o podanych ID z listy
-    const updatedUsers = usersData.filter(user => !idsToDelete.includes(user.id));
-  
-    // Zaktualizuj listę danych
-    usersData.length = 0;
-    usersData.push(...updatedUsers);
-  
-    res.json(usersData);
-  });
-  
-// Nasłuchiwanie na określonym porcie
-app.listen(PORT, () => {
-  console.log(`Aplikacja działa na http://localhost:${PORT}`);
+  res.json(usersData);
+});
+
+// Endpoint obsługujący usuwanie danych
+app.delete('/users/:id', (req, res) => {
+  const userId = parseInt(req.params.id);
+
+  // Sprawdzenie czy obiekt o danym ID istnieje
+  const userIndex = usersData.findIndex(user => user.id === userId);
+
+  if (userIndex === -1) {
+    return res.status(404).json({ error: 'Nie znaleziono użytkownika o podanym ID.' });
+  }
+
+  // Usunięcie obiektu z listy
+  usersData.splice(userIndex, 1);
+
+  res.json({ message: 'Użytkownik został usunięty pomyślnie.' });
+});
+
+app.listen(port, () => {
+  console.log(`Serwer nasłuchuje na http://localhost:${port}`);
 });

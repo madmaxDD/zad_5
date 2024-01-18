@@ -1,31 +1,24 @@
 function submitForm() {
-    // Pobranie danych z formularza
-    const field1 = document.getElementById('field1').value;
-    const field2 = document.getElementById('field2').value;
-    const field3 = document.getElementById('field3').value;
-  
-    // Walidacja danych na froncie
-    const errorMessage = document.getElementById('errorMessage');
-    if (!field1 || !field2 || !field3) {
-      errorMessage.textContent = 'Wszystkie pola formularza są wymagane.';
-      return;
-    }
-  
-    // Przygotowanie danych do wysłania na backend
-    const data = { field1, field2, field3 };
-  
-    // Wysłanie danych asynchronicznie na backend
-    fetch('/users', {
+  // Pobieranie danych z formularza
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const age = document.getElementById('age').value;
+
+  // Walidacja danych po stronie frontendu (możesz dostosować do własnych potrzeb)
+
+  // Asynchroniczne wysłanie danych na backend
+  fetch('/users', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+          'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.text())
-    .then(message => {
-      errorMessage.textContent = message;
-    })
-    .catch(error => console.error('Błąd:', error));
-  }
-  
+      body: JSON.stringify({ name, email, age }),
+  })
+  .then(response => response.json())
+  .then(data => {
+      alert(data.message); // Wyświetlenie komunikatu
+      document.getElementById('userForm').reset(); // Wyczyszczenie formularza
+      window.location.href = '/list.html';
+  })
+  .catch(error => console.error('Błąd:', error));
+}
